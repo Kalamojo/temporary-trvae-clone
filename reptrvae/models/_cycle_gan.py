@@ -4,7 +4,8 @@ import os
 import anndata
 import keras
 import numpy as np
-from keras.layers import Input, Dense, BatchNormalization, LeakyReLU, Dropout, ReLU
+from keras.layers import Input, Dense, BatchNormalization, LeakyReLU, Dropout
+from keras.activations import relu
 from keras.models import Model, load_model
 from keras.optimizers import Adam
 
@@ -110,7 +111,7 @@ class CycleGAN(Network):
         h = Dense(self.x_dimension, kernel_initializer=self.init_w, kernel_regularizer=self.regularizer,
                   use_bias=False)(h)
         h = BatchNormalization(axis=1, trainable=True)(h)
-        h = ReLU()(h)
+        h = relu()(h)
 
         generator = Model(self.x, h, name=name)
         self.aux_models[f"{name}_latent"] = Model(self.x, h_z, name=f"{name}_latent")

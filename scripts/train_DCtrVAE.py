@@ -18,20 +18,17 @@ if data_name == "celeba":
     condition_key = "condition"
     specific_labels = [1]
     arch_style = 3
-    """
-    adata = reptrvae.dl.prepare_and_load_celeba(file_path="./data/celeba/img_align_celeba.zip",
-                                                attr_path="./data/celeba/list_attr_celeba.txt",
-                                                landmark_path="./data/celeba/list_landmarks_align_celeba.txt",
+    adata = reptrvae.dl.prepare_and_load_celeba(file_path="./data/img_align_celeba.zip",
+                                                attr_path="./data/list_attr_celeba.txt",
+                                                landmark_path="./data/list_landmarks_align_celeba.txt",
                                                 gender="Male",
                                                 attribute="Smiling",
-                                                max_n_images=50000,
-                                                img_width=64,
-                                                img_height=64,
+                                                max_n_images=1000,
+                                                img_width=32,
+                                                img_height=32,
                                                 restore=True,
                                                 save=True)
-    #"""
-    adata = sc.read("./data/celeba.h5ad")
-    input_shape = (64, 64, 3)
+    input_shape = (32, 32, 3)
 elif data_name == "mnist":
     conditions = ["normal", "thin", "thick"]
     target_conditions = ["thin", 'thick']
@@ -41,7 +38,7 @@ elif data_name == "mnist":
     condition_key = "condition"
     specific_labels = [1, 3, 6, 7]
     arch_style = 1
-    adata = sc.read("./data/mnist.h5ad")
+    adata = sc.read("./data/thick_thin_mnist.h5ad")
     input_shape = (28, 28, 1)
 else:
     raise Exception("Invalid data name")
@@ -77,8 +74,8 @@ network.train(net_train_adata,
               net_valid_adata,
               labelencoder,
               condition_key,
-              n_epochs=10000,
-              batch_size=512,
+              n_epochs=2000,
+              batch_size=1024,
               verbose=2,
               early_stop_limit=150,
               lr_reducer=100,
@@ -105,12 +102,11 @@ for target_condition in target_conditions:
 
         pred_adata_all = pred_adata.copy() if pred_adata_all is None else pred_adata_all.concatenate(pred_adata)
 
-os.makedirs(f"./data/reconstructed/{data_name}/", exist_ok=True)
-pred_adata_all.write_h5ad(f"./data/reconstructed/{data_name}/trVAE.h5ad")
+os.makedirs(f"./data/reconstructed/trVAE_{data_name}/", exist_ok=True)
+pred_adata_all.write_h5ad(f"./data/reconstructed/trVAE_{data_name}/{data_name}.h5ad")
 
 os.makedirs(f"./results/{data_name}/", exist_ok=True)
-reptrvae.pl.plot_umap(mmd_adata,
-                       condition_key, cell_type_key,
-                       frameon=False, path_to_save=f"./results/{data_name}/", model_name="trVAE_MMD",
-                       ext="png")
-print("All done")
+# reptrvae.pl.plot_umap(mmd_adata,
+#                       condition_key, cell_type_key,
+#                       frameon=False, path_to_save=f"./results/{data_name}/", model_name="trVAE_MMD",
+#                       ext="png")

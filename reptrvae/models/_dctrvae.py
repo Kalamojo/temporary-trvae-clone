@@ -16,6 +16,14 @@ from reptrvae.models._utils import sample_z, print_message
 from reptrvae.utils import label_encoder, remove_sparsity
 from ._losses import LOSSES
 
+"""
+import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.9
+keras.backend.set_session(tf.Session(config=config));
+#"""
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+
 log = logging.getLogger(__file__)
 
 
