@@ -61,7 +61,7 @@ def reg_mean_plot(adata, condition_key, axis_keys, labels, path_to_save="./reg_m
     sns.set()
     sns.set(color_codes=True)
     if sparse.issparse(adata.X):
-        adata.X = adata.X.A
+        adata.X = adata.X.A.copy()
     diff_genes = top_100_genes
     stim = adata[adata.obs[condition_key] == axis_keys["y"]]
     ctrl = adata[adata.obs[condition_key] == axis_keys["x"]]

@@ -69,9 +69,9 @@ adata = sc.read(f"./data/{dname}_normalized.h5ad")
 #adata = sc.read(f"./data/{data_name}_count.h5ad")
 adata = adata[adata.obs[condition_key].isin(conditions)]
 
-if adata.shape[1] > 2000:
-    sc.pp.highly_variable_genes(adata, n_top_genes=2000)
-    adata = adata[:, adata.var['highly_variable']]
+#if adata.shape[1] > 2000:
+#    sc.pp.highly_variable_genes(adata, n_top_genes=2000)
+#    adata = adata[:, adata.var['highly_variable']]
 
 
 print(specific_celltype, sys.argv)
