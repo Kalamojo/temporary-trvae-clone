@@ -35,6 +35,34 @@ elif data_name == "alzPro" or data_name == "alzPho":
         specific_celltype = "3m"
     dname = data_name
 
+elif data_name == "alzProTrain" or data_name == "alzPhoTrain":
+    conditions = ["WT", "HET"]
+    target_conditions = ["HET"]
+    source_condition = "WT"
+    target_condition = "HET"
+    labelencoder = {"WT": 0, "HET": 1}
+    cell_type_key = "Validation"
+    condition_key = "Group"
+    if len(sys.argv) == 3:
+        specific_celltype = sys.argv[2]
+    else:
+        specific_celltype = "Test"
+    dname = data_name[:-5]
+
+elif data_name == "alzProTime" or data_name == "alzPhoTime":
+    conditions = ["3m", "6m", "9m"]
+    target_conditions = ["9m"]
+    source_condition = "9m"
+    target_condition = "9m"
+    labelencoder = {"3m": 0, "6m": 1, "9m": 2}
+    cell_type_key = "Group"
+    condition_key = "Timepoint"
+    if len(sys.argv) == 3:
+        specific_celltype = sys.argv[2]
+    else:
+        specific_celltype = "HET"
+    dname = data_name[:-4]
+
 elif data_name == "alzProSex":
     conditions = ["M", "F"]
     target_conditions = ["F"]
@@ -214,10 +242,10 @@ elif specific_celltype == '3m1':
 
     source_adata.write_h5ad(f"./data/reconstructed/trVAE_{data_name}/{specific_celltype}_latent.h5ad")
 
-    # reptrvae.pl.plot_umap(mmd_adata,
-    #                       condition_key, cell_type_key,
-    #                       frameon=False, path_to_save=f"./results/{data_name}/", model_name="trVAE_MMD",
-    #                       ext="png")
+    reptrvae.pl.plot_umap(mmd_adata,
+                          condition_key, cell_type_key,
+                          frameon=False, path_to_save=f"./results/{data_name}/", model_name="trVAE_MMD",
+                          ext="png")
 elif specific_celltype == '6m1':
     specific_celltype = specific_celltype[:-1]
     indices = np.arange(adata.shape[0])
@@ -376,7 +404,7 @@ else:
                                     clip_value=1e6,
                                     lambda_l1=0.0,
                                     lambda_l2=0.0,
-                                    learning_rate=0.001,
+                                    learning_rate=0.00005,
                                     model_path=f"./models/trVAE/best/{data_name}-{specific_celltype}/",
                                     dropout_rate=0.2,
                                     output_activation='relu')
@@ -385,11 +413,11 @@ else:
                   net_valid_adata,
                   labelencoder,
                   condition_key,
-                  n_epochs=1000,
-                  batch_size=512,
+                  n_epochs=2000,
+                  batch_size=4,
                   verbose=2,
-                  early_stop_limit=20,
-                  lr_reducer=10,
+                  early_stop_limit=500,
+                  lr_reducer=250,
                   shuffle=True,
                   save=True,
                   retrain=True,

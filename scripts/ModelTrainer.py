@@ -2,7 +2,10 @@ import subprocess
 import sys
 
 TRAINING_DICT = {
-    "trVAE": ["haber", "kang", "alzPro", "alzProSex", "alzPho"],
+    "trVAE": ["haber", "kang", 
+              "alzPro", "alzProSex", "alzPho", 
+              'alzProTrain', 'alzPhoTrain', 
+              'alzProTime', 'alzPhoTime'],
     "scGen": ["haber", "kang"],
     "cvae": ["haber", "kang"],
     "cyclegan": ["haber", "kang"],
@@ -36,6 +39,10 @@ def main():
         train('trVAE', "alzPro")
         train('trVAE', "alzProSex")
         train('trVAE', "alzPho")
+        train('trVAE', 'alzProTrain')
+        train('trVAE', 'alzPhoTrain')
+        train('trVAE', 'alzProTime')
+        train('trVAE', 'alzPhoTime')
         #train('trVAE', 'kang')
 
         train('cyclegan', 'haber')
