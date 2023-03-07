@@ -63,6 +63,20 @@ elif data_name == "alzProTime" or data_name == "alzPhoTime":
         specific_celltype = "HET"
     dname = data_name[:-4]
 
+elif data_name == "alzProTT" or data_name == "alzPhoTT":
+    conditions = ["3m", "6m", "9m"]
+    target_conditions = ["3m"]
+    source_condition = "3m"
+    target_condition = "3m"
+    labelencoder = {"3m": 0, "6m": 1, "9m": 2}
+    cell_type_key = "Validation"
+    condition_key = "Timepoint"
+    if len(sys.argv) == 3:
+        specific_celltype = sys.argv[2]
+    else:
+        specific_celltype = "Test"
+    dname = data_name[:-2]
+
 elif data_name == "alzProSex":
     conditions = ["M", "F"]
     target_conditions = ["F"]

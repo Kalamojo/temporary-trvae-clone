@@ -5,7 +5,8 @@ TRAINING_DICT = {
     "trVAE": ["haber", "kang", 
               "alzPro", "alzProSex", "alzPho", 
               'alzProTrain', 'alzPhoTrain', 
-              'alzProTime', 'alzPhoTime'],
+              'alzProTime', 'alzPhoTime',
+              'alzProTT', 'alzPhoTT'],
     "scGen": ["haber", "kang"],
     "cvae": ["haber", "kang"],
     "cyclegan": ["haber", "kang"],
@@ -43,6 +44,8 @@ def main():
         train('trVAE', 'alzPhoTrain')
         train('trVAE', 'alzProTime')
         train('trVAE', 'alzPhoTime')
+        train('trVAE', 'alzProTT')
+        train('trVAE', 'alzPhoTT')
         #train('trVAE', 'kang')
 
         train('cyclegan', 'haber')
