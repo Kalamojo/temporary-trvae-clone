@@ -306,18 +306,37 @@ class trVAE(Network):
             network.restore_model()
             ```
         """
-        self.cvae_model = load_model(os.path.join(self.model_to_use, 'mmd_cvae.h5'), compile=False)
-        self.encoder_model = load_model(os.path.join(self.model_to_use, 'encoder.h5'), compile=False)
-        self.decoder_model = load_model(os.path.join(self.model_to_use, 'decoder.h5'), compile=False)
-        self.decoder_mmd_model = load_model(os.path.join(self.model_to_use, 'decoder_mmd.h5'), compile=False)
+
+        #"""
+        self.cvae_model = load_model(os.path.join(self.model_to_use, 'mmd_cvae.h5'), compile=False, custom_objects={'Functional':keras.models.Model})
+        self.encoder_model = load_model(os.path.join(self.model_to_use, 'encoder.h5'), compile=False, custom_objects={'Functional':keras.models.Model})
+        self.decoder_model = load_model(os.path.join(self.model_to_use, 'decoder.h5'), compile=False, custom_objects={'Functional':keras.models.Model})
+        self.decoder_mmd_model = load_model(os.path.join(self.model_to_use, 'decoder_mmd.h5'), compile=False, custom_objects={'Functional':keras.models.Model})
+        #"""
+
+        """
+        self.cvae_model.load_weights(os.path.join(self.model_to_use, 'mmd_cvae.tf'))
+        self.encoder_model.load_weights(os.path.join(self.model_to_use, 'encoder.tf'))
+        self.decoder_model.load_weights(os.path.join(self.model_to_use, 'decoder.tf'))
+        self.decoder_mmd_model.load_weights(os.path.join(self.model_to_use, 'decoder_mmd.tf'))
+        #"""
         self.__compile_network()
 
     def save_model(self):
         os.makedirs(self.model_to_use, exist_ok=True)
+        #"""
         self.cvae_model.save(os.path.join(self.model_to_use, "mmd_cvae.h5"), overwrite=True)
         self.encoder_model.save(os.path.join(self.model_to_use, "encoder.h5"), overwrite=True)
         self.decoder_model.save(os.path.join(self.model_to_use, "decoder.h5"), overwrite=True)
         self.decoder_mmd_model.save(os.path.join(self.model_to_use, "decoder_mmd.h5"), overwrite=True)
+        #"""
+
+        """
+        self.cvae_model.save_weights(os.path.join(self.model_to_use, "mmd_cvae.tf"), save_format='tf')
+        self.encoder_model.save_weights(os.path.join(self.model_to_use, "encoder.tf"), save_format='tf')
+        self.decoder_model.save_weights(os.path.join(self.model_to_use, "decoder.tf"), save_format='tf')
+        self.decoder_mmd_model.save_weights(os.path.join(self.model_to_use, "decoder_mmd.tf"), save_format='tf')
+        #"""
 
     def train(self, train_adata, valid_adata=None,
               condition_encoder=None, condition_key='condition',

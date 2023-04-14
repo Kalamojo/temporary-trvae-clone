@@ -52,7 +52,7 @@ elif data_name == "alzProTrain" or data_name == "alzPhoTrain":
 elif data_name == "alzProTime" or data_name == "alzPhoTime":
     conditions = ["3m", "6m", "9m"]
     target_conditions = ["9m"]
-    source_condition = "9m"
+    source_condition = "3m"
     target_condition = "9m"
     labelencoder = {"3m": 0, "6m": 1, "9m": 2}
     cell_type_key = "Group"
@@ -107,8 +107,8 @@ elif data_name == "kang":
 else:
     raise Exception("InValid data name")
 
-adata = sc.read(f"./data/{dname}_normalized.h5ad")
-#adata = sc.read(f"./data/{data_name}_count.h5ad")
+#adata = sc.read(f"./data/{dname}_normalized.h5ad")
+adata = sc.read(f"./data/{dname}_count.h5ad")
 adata = adata[adata.obs[condition_key].isin(conditions)]
 
 #if adata.shape[1] > 2000:
@@ -410,32 +410,32 @@ else:
         ~((valid_adata.obs[cell_type_key] == specific_celltype) & (valid_adata.obs[condition_key].isin(target_conditions)))]
 
     network = reptrvae.models.trVAE(x_dimension=net_train_adata.shape[1],
-                                    z_dimension=40,
+                                    z_dimension=50,
                                     n_conditions=len(net_train_adata.obs[condition_key].unique()),
-                                    alpha=5e-5,
-                                    beta=500,
-                                    eta=100,
+                                    alpha=5e-7,
+                                    beta=50,
+                                    eta=20,
                                     clip_value=1e6,
                                     lambda_l1=0.0,
                                     lambda_l2=0.0,
-                                    learning_rate=0.00005,
+                                    learning_rate=0.001,
                                     model_path=f"./models/trVAE/best/{data_name}-{specific_celltype}/",
                                     dropout_rate=0.2,
                                     output_activation='relu')
     #"""
     network.train(net_train_adata,
-                  net_valid_adata,
-                  labelencoder,
-                  condition_key,
-                  n_epochs=2000,
-                  batch_size=4,
-                  verbose=2,
-                  early_stop_limit=500,
-                  lr_reducer=250,
-                  shuffle=True,
-                  save=True,
-                  retrain=True,
-                  )
+                net_valid_adata,
+                labelencoder,
+                condition_key,
+                n_epochs=10000,
+                batch_size=4,
+                verbose=2,
+                early_stop_limit=500,
+                lr_reducer=250,
+                shuffle=True,
+                save=True,
+                retrain=True,
+                )
     #"""
 
     train_labels, _ = reptrvae.tl.label_encoder(net_train_adata, labelencoder, condition_key)
@@ -458,8 +458,45 @@ else:
     adata_to_write = pred_adata.concatenate(target_adata)
     adata_to_write.write_h5ad(f"./data/reconstructed/trVAE_{data_name}/{specific_celltype}.h5ad")
     
-    reptrvae.pl.plot_umap(mmd_adata,
-                           condition_key, cell_type_key,
-                           frameon=False, path_to_save=f"./results/{data_name}/", model_name="trVAE_MMD",
-                           ext="png")
+    #reptrvae.pl.plot_umap(mmd_adata,
+    #                       condition_key, cell_type_key,
+    #                       frameon=False, path_to_save=f"./results/{data_name}/", model_name="trVAE_MMD",
+    #                       ext="png")
+#print(network)
+#print(dir(network))
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+log_data = pd.read_csv('./csv_logger.log', sep=',', engine='python')
+
+y_loss = log_data["loss"]
+y_vloss = log_data["val_loss"]
+
+y_mmd = log_data["mmd_loss"]
+y_vmmd = log_data["val_mmd_loss"]
+
+y_kl = log_data["kl_mse_loss"]
+y_vkl = log_data["val_kl_mse_loss"]
+
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+ax1.plot(np.arange(len(y_vloss)), y_vloss, marker='.', c='red')
+ax1.plot(np.arange(len(y_loss)), y_loss, marker='.', c='blue')
+ax1.grid()
+plt.setp(ax1, xlabel='epoch', ylabel='loss')
+
+ax2.plot(np.arange(len(y_vmmd)), y_vmmd, marker='.', c='red')
+ax2.plot(np.arange(len(y_mmd)), y_mmd, marker='.', c='blue')
+ax2.grid()
+plt.setp(ax2, xlabel='epoch', ylabel='mmd loss')
+
+ax3.plot(np.arange(len(y_vkl)), y_vkl, marker='.', c='red')
+ax3.plot(np.arange(len(y_kl)), y_kl, marker='.', c='blue')
+ax3.grid()
+plt.setp(ax3, xlabel='epoch', ylabel='kl mse loss')
+
+plt.show()
+fig.savefig('res1.png')
+plt.savefig('res2.png')
+
 print("All done")
